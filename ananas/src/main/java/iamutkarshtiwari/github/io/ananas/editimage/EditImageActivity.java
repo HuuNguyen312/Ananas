@@ -289,7 +289,7 @@ public class EditImageActivity extends BaseActivity implements OnLoadingDialogLi
                 break;
             default:
                 if (canAutoExit()) {
-                    onSaveTaskDone();
+                    onSaveTaskDone(true);
                 } else {
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                     alertDialogBuilder.setMessage(R.string.iamutkarshtiwari_github_io_ananas_exit_without_save)
@@ -321,13 +321,16 @@ public class EditImageActivity extends BaseActivity implements OnLoadingDialogLi
         }
     }
 
-    protected void onSaveTaskDone() {
+    protected void onSaveTaskDone(boolean fromBack) {
         Intent returnIntent = new Intent();
-        returnIntent.putExtra(ImageEditorIntentBuilder.SOURCE_PATH, sourceFilePath);
-        returnIntent.putExtra(ImageEditorIntentBuilder.OUTPUT_PATH, outputFilePath);
-        returnIntent.putExtra(IS_IMAGE_EDITED, numberOfOperations > 0);
-
-        setResult(RESULT_OK, returnIntent);
+        if(fromBack) {
+            setResult(RESULT_CANCELED, returnIntent);
+        } else {
+            returnIntent.putExtra(ImageEditorIntentBuilder.SOURCE_PATH, sourceFilePath);
+            returnIntent.putExtra(ImageEditorIntentBuilder.OUTPUT_PATH, outputFilePath);
+            returnIntent.putExtra(IS_IMAGE_EDITED, numberOfOperations > 0);
+            setResult(RESULT_OK, returnIntent);
+        }
         finish();
     }
 
@@ -345,7 +348,7 @@ public class EditImageActivity extends BaseActivity implements OnLoadingDialogLi
                 .subscribe(result -> {
                     if (result) {
                         resetOpTimes();
-                        onSaveTaskDone();
+                        onSaveTaskDone(false);
                     } else {
                         showToast(R.string.iamutkarshtiwari_github_io_ananas_save_error);
                     }
@@ -486,7 +489,7 @@ public class EditImageActivity extends BaseActivity implements OnLoadingDialogLi
         @Override
         public void onClick(View v) {
             if (numberOfOperations == 0) {
-                onSaveTaskDone();
+                onSaveTaskDone(false);
             } else {
                 doSaveImage();
             }
